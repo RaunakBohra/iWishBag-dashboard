@@ -9,16 +9,55 @@
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 20px;
+            background-color: #f8f9fa;
         }
         button {
             padding: 10px;
             font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #orders {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        @media (max-width: 768px) {
+            button {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
 
-    <h2>iWishBag Order Management</h2> //ffffff// 
+    <h2>🚀 iWishBag Order Management</h2>
     <button onclick="fetchOrders()">Fetch Orders</button>
 
     <div id="orders"></div>
@@ -26,22 +65,33 @@
     <script>
         async function fetchOrders() {
             const url = "https://script.google.com/macros/s/AKfycbwZgLLIOLrlFVFRqyKoTHxIMkwOKb_C2nijrWAsTWhE_alPW_aX2VwoQC_HCt6chlNNoA/exec";
-            document.getElementById("orders").innerHTML = "⏳ Loading...";
-
+            let ordersDiv = document.getElementById("orders");
+            
+            ordersDiv.innerHTML = "⏳ Loading orders...";
+            
             try {
-                let response = await fetch(url);
+                let response = await fetch(url, { method: "GET" });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
+                }
+
                 let data = await response.json();
                 
-                let output = "<h3>Orders List</h3><ul>";
+                if (!Array.isArray(data) || data.length === 0) {
+                    throw new Error("No orders found or invalid data format.");
+                }
+
+                let output = "<h3 class='success'>✅ Orders List</h3><ul>";
                 data.forEach(order => {
-                    output += `<li><strong>${order["Order ID"]}</strong>: ${order["Customer Name"]}</li>`;
+                    output += `<li><strong>Order ID:</strong> ${order["Order ID"]} - <strong>Customer:</strong> ${order["Customer Name"]}</li>`;
                 });
                 output += "</ul>";
 
-                document.getElementById("orders").innerHTML = output;
+                ordersDiv.innerHTML = output;
             } catch (error) {
-                document.getElementById("orders").innerHTML = "❌ Failed to fetch orders.";
-                console.error(error);
+                ordersDiv.innerHTML = "<p class='error'>❌ Failed to fetch orders. Please check the console.</p>";
+                console.error("Fetch Orders Error:", error);
             }
         }
     </script>
