@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iWishBag Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>iWishBag Order Management</h2>
+    <button onclick="fetchOrders()">Fetch Orders</button>
+
+    <div id="orders"></div>
+
+    <script>
+        async function fetchOrders() {
+            const url = "https://script.google.com/macros/s/AKfycbwZgLLIOLrlFVFRqyKoTHxIMkwOKb_C2nijrWAsTWhE_alPW_aX2VwoQC_HCt6chlNNoA/exec";
+            document.getElementById("orders").innerHTML = "⏳ Loading...";
+
+            try {
+                let response = await fetch(url);
+                let data = await response.json();
+                
+                let output = "<h3>Orders List</h3><ul>";
+                data.forEach(order => {
+                    output += `<li><strong>${order["Order ID"]}</strong>: ${order["Customer Name"]}</li>`;
+                });
+                output += "</ul>";
+
+                document.getElementById("orders").innerHTML = output;
+            } catch (error) {
+                document.getElementById("orders").innerHTML = "❌ Failed to fetch orders.";
+                console.error(error);
+            }
+        }
+    </script>
+
+</body>
+</html>
