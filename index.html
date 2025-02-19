@@ -1,100 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iWishBag Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-            background-color: #f8f9fa;
-        }
-        button {
-            padding: 10px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #orders {
-            margin-top: 20px;
-            text-align: left;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            background: white;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .error {
-            color: red;
-        }
-        .success {
-            color: green;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-        }
-        @media (max-width: 768px) {
-            button {
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-<body>
+async function fetchOrders1() {
+    const url = "https://script.google.com/macros/s/AKfycbwp30MA9woAgRfiKL57j2yXLE4ICczei6gIUAPZ9rpItkjlb_v9Oba6rD2QvIrTy4Wjug/exec"; 
+    document.getElementById("orders").innerHTML = "⏳ Loading...";
 
-    <h2>🚀 iWishBag Order Management</h2>
-    <button onclick="fetchOrders()">Fetch Orders</button>
+    try {
+        let response = await fetch(url, {
+            credentials: "include" // 🔹 Allows Google authentication
+        });
 
-    <div id="orders"></div>
-
-    <script>
-        async function fetchOrders() {
-            const url = "https://script.google.com/macros/s/AKfycby0ykjXgv31ybYxcZJNBlmTDty8csLmA68rCpF6VNQIIuzIf_MqtRYb7u5MlzBzSdUVCQ/exec";
-            let ordersDiv = document.getElementById("orders");
-            
-            ordersDiv.innerHTML = "⏳ Loading orders...";
-            
-            try {
-                let response = await fetch(url, { method: "GET" });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
-                }
-
-                let data = await response.json();
-                
-                if (!Array.isArray(data) || data.length === 0) {
-                    throw new Error("No orders found or invalid data format.");
-                }
-
-                let output = "<h3 class='success'>✅ Orders List</h3><ul>";
-                data.forEach(order => {
-                    output += `<li><strong>Order ID:</strong> ${order["Order ID"]} - <strong>Customer:</strong> ${order["Customer Name"]}</li>`;
-                });
-                output += "</ul>";
-
-                ordersDiv.innerHTML = output;
-            } catch (error) {
-                ordersDiv.innerHTML = "<p class='error'>❌ Failed to fetch orders. Please check the console.</p>";
-                console.error("Fetch Orders Error:", error);
-            }
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
         }
-    </script>
 
-</body>
-</html>
+        let data = await response.json();
+
+        let output = "<h3>✅ Orders List</h3><ul>";
+        data.forEach(order => {
+            output += `<li><strong>${order["Order ID"]}</strong>: ${order["Customer Name"]}</li>`;
+        });
+        output += "</ul>";
+
+        document.getElementById("orders").innerHTML = output;
+    } catch (error) {
+        document.getElementById("orders").innerHTML = "❌ Failed to fetch orders.";
+        console.error(error);
+    }
+}
