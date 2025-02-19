@@ -64,42 +64,27 @@
 
     <script>
         async function fetchOrders() {
-            const url = "https://script.google.com/macros/s/AKfycbwp30MA9woAgRfiKL57j2yXLE4ICczei6gIUAPZ9rpItkjlb_v9Oba6rD2QvIrTy4Wjug/exec"; // ✅ Replace with your actual script URL
+    const scriptURL = "https://script.google.com/macros/s/AKfycbx17jzxZ7WMAi0ijE1-l25jkZkOttKWl5l_KV_inqlLLptWeztaVFezM4CFJ3bUkqkQjg/exec";
+    const proxyURL = `https://corsproxy.io/?${encodeURIComponent(scriptURL)}`;
 
-            let ordersDiv = document.getElementById("orders");
-            ordersDiv.innerHTML = "⏳ Loading orders...";
+    document.getElementById("orders").innerHTML = "⏳ Loading...";
 
-            try {
-                let response = await fetch(url, {
-                    method: "GET",
-                    mode: "cors",
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                });
+    try {
+        let response = await fetch(proxyURL);
+        let data = await response.json();
 
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
-                }
+        let output = "<h3>✅ Orders List</h3><ul>";
+        data.forEach(order => {
+            output += `<li><strong>${order["Order ID"]}</strong>: ${order["Customer Name"]}</li>`;
+        });
+        output += "</ul>";
 
-                let data = await response.json();
-                
-                if (!Array.isArray(data) || data.length === 0) {
-                    throw new Error("No orders found or invalid data format.");
-                }
-
-                let output = "<h3 class='success'>✅ Orders List</h3><ul>";
-                data.forEach(order => {
-                    output += `<li><strong>Order ID:</strong> ${order["Order ID"]} - <strong>Customer:</strong> ${order["Customer Name"]}</li>`;
-                });
-                output += "</ul>";
-
-                ordersDiv.innerHTML = output;
-            } catch (error) {
-                ordersDiv.innerHTML = "<p class='error'>❌ Failed to fetch orders. Check console.</p>";
-                console.error("Fetch Orders Error:", error);
-            }
-        }
+        document.getElementById("orders").innerHTML = output;
+    } catch (error) {
+        document.getElementById("orders").innerHTML = "❌ Failed to fetch orders.";
+        console.error(error);
+    }
+}
     </script>
 
 </body>
